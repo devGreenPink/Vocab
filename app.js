@@ -62,71 +62,79 @@ class VocabularyGame {
 
   // ฟังก์ชันผูก event listeners
   bindEvents() {
-     // ปุ่มหลัก
-  this.elements.addButton.addEventListener('click', () => this.addWord());
-  this.elements.startButton.addEventListener('click', () => this.startGame());
-  this.elements.clearButton.addEventListener('click', () => this.clearWords());
-  this.elements.clearHistoryButton.addEventListener('click', () => this.clearAllHistory());
-  this.elements.resetButton.addEventListener('click', () => this.resetGame());
-  this.elements.backButton.addEventListener('click', () => this.backToAdd());
-  
-  // รองรับการกด Enter ในช่องใส่ข้อมูล
-  [this.elements.englishInput, this.elements.thaiInput].forEach(input => {
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') this.addWord();
+    // ปุ่มหลัก
+    this.elements.addButton.addEventListener("click", () => this.addWord());
+    this.elements.startButton.addEventListener("click", () => this.startGame());
+    this.elements.clearButton.addEventListener("click", () =>
+      this.clearWords()
+    );
+    this.elements.clearHistoryButton.addEventListener("click", () =>
+      this.clearAllHistory()
+    );
+    this.elements.resetButton.addEventListener("click", () => this.resetGame());
+    this.elements.backButton.addEventListener("click", () => this.backToAdd());
+
+    // รองรับการกด Enter ในช่องใส่ข้อมูล
+    [this.elements.englishInput, this.elements.thaiInput].forEach((input) => {
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") this.addWord();
+      });
     });
-  });
 
-  // จำกัดการป้อนข้อมูลในช่องภาษาอังกฤษให้เป็นภาษาอังกฤษเท่านั้น
-  this.elements.englishInput.addEventListener('input', (e) => {
-    let value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
-    if (value.length > 0) {
-      value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-    }
-    e.target.value = value;
-  });
-
-  // Modal events - ใช้ callback function ที่เก็บไว้
-  this.elements.saveNameButton.addEventListener('click', () => this.saveHistoryName());
-  this.elements.cancelEditButton.addEventListener('click', () => this.closeEditModal());
-  
-  // แก้ไขการจัดการปุ่มยืนยันการลบ
-  this.elements.confirmDeleteButton.addEventListener('click', () => {
-    console.log('Confirm delete button clicked');
-    console.log('pendingConfirmAction:', this.pendingConfirmAction);
-    
-    if (this.pendingConfirmAction) {
-      this.pendingConfirmAction();
-    }
-    this.closeConfirmModal();
-  });
-  
-  this.elements.cancelDeleteButton.addEventListener('click', () => {
-    console.log('Cancel delete button clicked');
-    this.closeConfirmModal();
-  });
-
-  // ปิด modal เมื่อคลิกปุ่ม X
-  document.querySelectorAll('.modal-close').forEach(closeBtn => {
-    closeBtn.addEventListener('click', (e) => {
-      const modal = e.target.closest('.modal');
-      modal.classList.add('hidden');
-    });
-  });
-
-  // ปิด modal เมื่อคลิกนอกพื้นที่
-  [this.elements.editModal, this.elements.confirmModal].forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
+    // จำกัดการป้อนข้อมูลในช่องภาษาอังกฤษให้เป็นภาษาอังกฤษเท่านั้น
+    this.elements.englishInput.addEventListener("input", (e) => {
+      let value = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+      if (value.length > 0) {
+        value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
       }
+      e.target.value = value;
     });
-  });
 
-  // รองรับการกด Enter ใน modal
-  this.elements.editNameInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') this.saveHistoryName();
-  });
+    // Modal events - ใช้ callback function ที่เก็บไว้
+    this.elements.saveNameButton.addEventListener("click", () =>
+      this.saveHistoryName()
+    );
+    this.elements.cancelEditButton.addEventListener("click", () =>
+      this.closeEditModal()
+    );
+
+    // แก้ไขการจัดการปุ่มยืนยันการลบ
+    this.elements.confirmDeleteButton.addEventListener("click", () => {
+      console.log("Confirm delete button clicked");
+      console.log("pendingConfirmAction:", this.pendingConfirmAction);
+
+      if (this.pendingConfirmAction) {
+        this.pendingConfirmAction();
+      }
+      this.closeConfirmModal();
+    });
+
+    this.elements.cancelDeleteButton.addEventListener("click", () => {
+      console.log("Cancel delete button clicked");
+      this.closeConfirmModal();
+    });
+
+    // ปิด modal เมื่อคลิกปุ่ม X
+    document.querySelectorAll(".modal-close").forEach((closeBtn) => {
+      closeBtn.addEventListener("click", (e) => {
+        const modal = e.target.closest(".modal");
+        modal.classList.add("hidden");
+      });
+    });
+
+    // ปิด modal เมื่อคลิกนอกพื้นที่
+    [this.elements.editModal, this.elements.confirmModal].forEach((modal) => {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.classList.add("hidden");
+        }
+      });
+    });
+
+    // รองรับการกด Enter ใน modal
+    this.elements.editNameInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") this.saveHistoryName();
+    });
   }
 
   // ฟังก์ชันตั้งค่าหน้าจอเริ่มต้น
@@ -434,38 +442,40 @@ class VocabularyGame {
   // ฟังก์ชันจบเกม
   gameComplete() {
     if (!this.gameStartTime) return;
-  
-  this.stopTimer();
-  const endTime = new Date();
-  const timeSpent = Math.round((endTime.getTime() - this.gameStartTime.getTime()) / 1000);
-  
-  const gameRecord = {
-    id: Date.now(),
-    name: `เกมเมื่อ ${endTime.toLocaleDateString('th-TH')}`,
-    words: [...this.words],
-    completedAt: endTime.toISOString(),
-    timeSpent: timeSpent,
-    wordsCount: this.words.length
-  };
 
-  this.gameHistory.unshift(gameRecord);
-  if (this.gameHistory.length > 10) {
-    this.gameHistory = this.gameHistory.slice(0, 10);
-  }
-  
-  localStorage.setItem('gameHistory', JSON.stringify(this.gameHistory));
-  
-  this.showGameCompleteScreen();
-  this.showToast(`ยินดีด้วย! ใช้เวลา ${timeSpent} วินาที`, 'success');
-  
-  // ล้างคำศัพท์ปัจจุบัน
-  this.words = [];
-  
-  setTimeout(() => {
-    this.backToAdd();
-    this.renderCurrentWords(); // render คำศัพท์ปัจจุบัน
-    this.renderHistory(); // render ประวัติใหม่
-  }, 3000);
+    this.stopTimer();
+    const endTime = new Date();
+    const timeSpent = Math.round(
+      (endTime.getTime() - this.gameStartTime.getTime()) / 1000
+    );
+
+    const gameRecord = {
+      id: Date.now(),
+      name: `เกมเมื่อ ${endTime.toLocaleDateString("th-TH")}`,
+      words: [...this.words],
+      completedAt: endTime.toISOString(),
+      timeSpent: timeSpent,
+      wordsCount: this.words.length,
+    };
+
+    this.gameHistory.unshift(gameRecord);
+    if (this.gameHistory.length > 10) {
+      this.gameHistory = this.gameHistory.slice(0, 10);
+    }
+
+    localStorage.setItem("gameHistory", JSON.stringify(this.gameHistory));
+
+    this.showGameCompleteScreen();
+    this.showToast(`ยินดีด้วย! ใช้เวลา ${timeSpent} วินาที`, "success");
+
+    // ล้างคำศัพท์ปัจจุบัน
+    this.words = [];
+
+    setTimeout(() => {
+      this.backToAdd();
+      this.renderCurrentWords(); // render คำศัพท์ปัจจุบัน
+      this.renderHistory(); // render ประวัติใหม่
+    }, 3000);
   }
 
   // ฟังก์ชันเริ่มเกมใหม่
@@ -489,73 +499,89 @@ class VocabularyGame {
   // ฟังก์ชันแสดงประวัติเกม
   renderHistory() {
     if (this.gameHistory.length === 0) {
-      this.elements.historyContainer.innerHTML = '<p style="text-align: center; color: #718096; padding: 20px;">ยังไม่มีประวัติการเล่น</p>';
+      this.elements.historyContainer.innerHTML =
+        '<p style="text-align: center; color: #718096; padding: 20px;">ยังไม่มีประวัติการเล่น</p>';
       return;
     }
-  
-    this.elements.historyContainer.innerHTML = this.gameHistory.map(record => {
-      const date = new Date(record.completedAt);
-      const formattedDate = date.toLocaleDateString('th-TH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-  
-      return `
+
+    this.elements.historyContainer.innerHTML = this.gameHistory
+      .map((record) => {
+        const date = new Date(record.completedAt);
+        const formattedDate = date.toLocaleDateString("th-TH", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        return `
         <div class="history-item">
           <div class="history-header">
-            <span class="history-title">${record.name || `เกม ${formattedDate}`}</span>
+            <span class="history-title">${
+              record.name || `เกม ${formattedDate}`
+            }</span>
             <div class="history-stats">
               <span>📝 ${record.wordsCount} คำ</span>
               <span>⏰ ${record.timeSpent} วินาที</span>
-              <button type="button" class="edit-btn" data-record-id="${record.id}">✏️ แก้ไข</button>
-              <button type="button" class="play-again-btn" data-record-id="${record.id}">เล่นอีกครั้ง</button>
-              <button type="button" class="delete-history-btn" data-record-id="${record.id}">🗑️ ลบ</button>
+              <button type="button" class="edit-btn" data-record-id="${
+                record.id
+              }">✏️ แก้ไข</button>
+              <button type="button" class="play-again-btn" data-record-id="${
+                record.id
+              }">เล่นอีกครั้ง</button>
+              <button type="button" class="delete-history-btn" data-record-id="${
+                record.id
+              }">🗑️ ลบ</button>
             </div>
           </div>
           <div class="history-words">
-            ${record.words.map(word => `
+            ${record.words
+              .map(
+                (word) => `
               <div class="history-word">
                 <span>${word.english}</span>
                 <span>${word.thai}</span>
               </div>
-            `).join('')}
+            `
+              )
+              .join("")}
           </div>
         </div>
       `;
-    }).join('');
-  
+      })
+      .join("");
+
     // ผูก event listener ใหม่หลังจาก render
     this.bindHistoryEvents();
   }
   bindHistoryEvents() {
- // ใช้ event delegation แทนการผูก event แต่ละปุ่ม
-  // ลบ event listener เก่าก่อน
-  const newHistoryContainer = this.elements.historyContainer.cloneNode(true);
-  this.elements.historyContainer.parentNode.replaceChild(newHistoryContainer, this.elements.historyContainer);
-  this.elements.historyContainer = newHistoryContainer;
+    // ใช้ event delegation แทนการผูก event แต่ละปุ่ม
+    // ลบ event listener เก่าก่อน
+    const newHistoryContainer = this.elements.historyContainer.cloneNode(true);
+    this.elements.historyContainer.parentNode.replaceChild(
+      newHistoryContainer,
+      this.elements.historyContainer
+    );
+    this.elements.historyContainer = newHistoryContainer;
 
-  // ใช้ event delegation - ผูก event เพียงครั้งเดียวที่ container
-  this.elements.historyContainer.addEventListener('click', (e) => {
-    const recordId = parseInt(e.target.getAttribute('data-record-id'));
-    
-    if (!recordId) return; // ถ้าไม่มี record id ให้หยุด
-    
-    if (e.target.classList.contains('edit-btn')) {
-      console.log('Edit button clicked for record:', recordId);
-      this.editHistoryName(recordId);
-    } 
-    else if (e.target.classList.contains('play-again-btn')) {
-      console.log('Play again button clicked for record:', recordId);
-      this.playAgain(recordId);
-    } 
-    else if (e.target.classList.contains('delete-history-btn')) {
-      console.log('Delete button clicked for record:', recordId);
-      this.deleteHistory(recordId);
-    }
-  });
+    // ใช้ event delegation - ผูก event เพียงครั้งเดียวที่ container
+    this.elements.historyContainer.addEventListener("click", (e) => {
+      const recordId = parseInt(e.target.getAttribute("data-record-id"));
+
+      if (!recordId) return; // ถ้าไม่มี record id ให้หยุด
+
+      if (e.target.classList.contains("edit-btn")) {
+        console.log("Edit button clicked for record:", recordId);
+        this.editHistoryName(recordId);
+      } else if (e.target.classList.contains("play-again-btn")) {
+        console.log("Play again button clicked for record:", recordId);
+        this.playAgain(recordId);
+      } else if (e.target.classList.contains("delete-history-btn")) {
+        console.log("Delete button clicked for record:", recordId);
+        this.deleteHistory(recordId);
+      }
+    });
   }
   // ฟังก์ชันแก้ไขชื่อประวัติ
   editHistoryName(recordId) {
@@ -594,29 +620,29 @@ class VocabularyGame {
 
   // ฟังก์ชันลบประวัติ
   deleteHistory(recordId) {
-    console.log('deleteHistory called with recordId:', recordId);
-    console.log('Current gameHistory:', this.gameHistory);
-    
-    const record = this.gameHistory.find(r => r.id === recordId);
+    console.log("deleteHistory called with recordId:", recordId);
+    console.log("Current gameHistory:", this.gameHistory);
+
+    const record = this.gameHistory.find((r) => r.id === recordId);
     if (!record) {
-      console.log('Record not found!');
-      this.showToast('ไม่พบประวัติที่ต้องการลบ', 'error');
+      console.log("Record not found!");
+      this.showToast("ไม่พบประวัติที่ต้องการลบ", "error");
       return;
     }
-    
-    console.log('Found record to delete:', record);
+
+    console.log("Found record to delete:", record);
     this.currentDeleteId = recordId;
     this.elements.confirmMessage.textContent = `ต้องการลบประวัติ "${record.name}" หรือไม่?`;
-    this.elements.confirmModal.classList.remove('hidden');
-    
+    this.elements.confirmModal.classList.remove("hidden");
+
     // ตั้งค่า callback function สำหรับการยืนยัน
     this.pendingConfirmAction = () => {
-      console.log('Confirming delete for recordId:', recordId);
-      this.gameHistory = this.gameHistory.filter(r => r.id !== recordId);
-      console.log('Updated gameHistory:', this.gameHistory);
-      localStorage.setItem('gameHistory', JSON.stringify(this.gameHistory));
+      console.log("Confirming delete for recordId:", recordId);
+      this.gameHistory = this.gameHistory.filter((r) => r.id !== recordId);
+      console.log("Updated gameHistory:", this.gameHistory);
+      localStorage.setItem("gameHistory", JSON.stringify(this.gameHistory));
       this.renderHistory();
-      this.showToast('ลบประวัติเรียบร้อย', 'info');
+      this.showToast("ลบประวัติเรียบร้อย", "info");
     };
   }
 
@@ -633,7 +659,7 @@ class VocabularyGame {
 
   // ฟังก์ชันปิด modal ยืนยัน
   closeConfirmModal() {
-    this.elements.confirmModal.classList.add('hidden');
+    this.elements.confirmModal.classList.add("hidden");
     this.currentDeleteId = null;
     this.pendingConfirmAction = null; // reset callback
   }
@@ -727,12 +753,80 @@ class VocabularyGame {
   // ฟังก์ชันแสดง confirmation modal แทน confirm
   showConfirmModal(message, onConfirm) {
     this.elements.confirmMessage.textContent = message;
-  this.elements.confirmModal.classList.remove('hidden');
-  
-  // เก็บ callback function ไว้ใน instance แทนการสร้าง event listener ใหม่
-  this.pendingConfirmAction = onConfirm;
+    this.elements.confirmModal.classList.remove("hidden");
+
+    // เก็บ callback function ไว้ใน instance แทนการสร้าง event listener ใหม่
+    this.pendingConfirmAction = onConfirm;
   }
 }
+// ✅ ส่งออกข้อมูล
+document.getElementById("exportButton").addEventListener("click", function () {
+  const vocabWords = JSON.parse(localStorage.getItem("vocabWords") || "[]");
+  const gameHistory = JSON.parse(localStorage.getItem("gameHistory") || "[]");
+
+  const dataToExport = {
+    vocabWords,
+    gameHistory,
+  };
+
+  const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {
+    type: "application/json",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "vocab_backup.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+});
+
+// ✅ เปิด File Picker เพื่อนำเข้า
+document.getElementById("importButton").addEventListener("click", function () {
+  document.getElementById("importFile").click();
+});
+
+// ✅ อ่านไฟล์ที่นำเข้า และบันทึกลง localStorage
+document
+  .getElementById("importFile")
+  .addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        if (importedData.vocabWords) {
+          localStorage.setItem(
+            "vocabWords",
+            JSON.stringify(importedData.vocabWords)
+          );
+        }
+        if (importedData.gameHistory) {
+          localStorage.setItem(
+            "gameHistory",
+            JSON.stringify(importedData.gameHistory)
+          );
+        }
+        Swal.fire({
+          icon: "success",
+          title: "สำเร็จ!",
+          text: "นำเข้าข้อมูลเรียบร้อยแล้ว 🎉",
+          timer: 1000,
+          showConfirmButton: false,
+        }).then(() => {
+          location.reload(); // หรืออัปเดต UI แทน
+          sessionStorage.setItem("accessGranted", "true");
+        });
+      } catch (err) {
+        alert("เกิดข้อผิดพลาดในการอ่านไฟล์ 😢");
+        console.error(err);
+      }
+    };
+    reader.readAsText(file);
+  });
 
 document.addEventListener("DOMContentLoaded", () => {
   window.game = new VocabularyGame();

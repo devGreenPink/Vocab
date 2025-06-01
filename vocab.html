@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>เกมจับคู่คำศัพท์</title>
+    <link rel="icon" href="assets/images/dictionary.png" type="image/png" />
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -33,7 +34,7 @@
         <div class="logo-container">
           <div class="logo">
             <span class="logo-text">📚</span>
-            <span class="logo-word">VOCAB</span>
+            <span class="logo-word">Vocabulary</span>
             <span class="logo-text">🎯</span>
           </div>
         </div>
@@ -53,7 +54,7 @@
         <div class="page-header">
           <div class="logo-small">
             <span class="logo-text">📚</span>
-            <span class="logo-word">VOCAB</span>
+            <span class="logo-word">-Vocabulary-</span>
             <span class="logo-text">🎯</span>
           </div>
           <h1>เกมจับคู่คำศัพท์</h1>
@@ -112,7 +113,29 @@
           <div id="historyContainer"></div>
         </div>
       </div>
-
+      <!-- Import/Export Section -->
+      <div class="import-export-section">
+        <div class="import-export-header">
+          <h3>📁 จัดการข้อมูล</h3>
+          <p>ส่งออกหรือนำเข้าคำศัพท์เพื่อใช้งานในอนาคต</p>
+        </div>
+        <div class="import-export-buttons">
+          <button type="button" id="exportButton" class="btn-import-export">
+            📤 ส่งออกข้อมูล
+          </button>
+          <div class="file-input-wrapper">
+            <button id="importButton" class="btn-secondary">
+              📂 นำเข้าข้อมูล
+            </button>
+            <input
+              type="file"
+              id="importFile"
+              accept=".json"
+              style="display: none"
+            />
+          </div>
+        </div>
+      </div>
       <!-- หน้าเกมจับคู่ -->
       <div id="game-section" class="page hidden">
         <div class="game-header">
