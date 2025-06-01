@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>เกมจับคู่คำศัพท์</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        if (sessionStorage.getItem("accessGranted") !== "true") {
+          Swal.fire({
+            icon: "warning",
+            title: "อุ๊ย",
+
+            text: "กรอก Password ก่อนนะจ๊ะ!",
+            confirmButtonText: "OK",
+          }).then(() => {
+            window.location.href = "index.html";
+          });
+        }
+      });
+
+      window.addEventListener("beforeunload", function () {
+        sessionStorage.removeItem("accessGranted");
+      });
+    </script>
+  </head>
+  <body>
+    <!-- หน้าเริ่มต้น/Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+      <div class="splash-content">
+        <div class="logo-container">
+          <div class="logo">
+            <span class="logo-text">📚</span>
+            <span class="logo-word">VOCAB</span>
+            <span class="logo-text">🎯</span>
+          </div>
+        </div>
+        <h1 class="splash-title">เกมจับคู่คำศัพท์</h1>
+        <div class="loading-animation">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+        </div>
+        <p class="splash-subtitle">เตรียมพร้อมเรียนรู้คำศัพท์ใหม่!</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- หน้าเพิ่มคำศัพท์ -->
+      <div id="add-section" class="page hidden">
+        <div class="page-header">
+          <div class="logo-small">
+            <span class="logo-text">📚</span>
+            <span class="logo-word">VOCAB</span>
+            <span class="logo-text">🎯</span>
+          </div>
+          <h1>เกมจับคู่คำศัพท์</h1>
+        </div>
+
+        <div class="input-section">
+          <div class="input-group">
+            <div class="input-container">
+              <label for="englishInput">คำภาษาอังกฤษ</label>
+              <input
+                type="text"
+                id="englishInput"
+                placeholder="English word..."
+                pattern="[A-Za-z\s]+"
+              />
+              <small class="input-hint"
+                >ใส่ได้เฉพาะตัวอักษรภาษาอังกฤษเท่านั้น</small
+              >
+            </div>
+            <div class="input-container">
+              <label for="thaiInput">คำแปลภาษาไทย</label>
+              <input type="text" id="thaiInput" placeholder="คำแปลภาษาไทย..." />
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button type="button" id="addButton" class="btn-primary">
+              ➕ เพิ่มคำ
+            </button>
+            <button type="button" id="startButton" class="btn-secondary">
+              🚀 เริ่มเกม
+            </button>
+            <button type="button" id="clearButton" class="btn-danger">
+              🗑️ ล้างทั้งหมด
+            </button>
+          </div>
+        </div>
+
+        <div id="currentWords" class="word-list">
+          <h3>คำศัพท์ปัจจุบัน (<span id="wordCount">0</span> คำ)</h3>
+          <div id="wordListContainer"></div>
+        </div>
+
+        <!-- ประวัติเกม -->
+        <div id="history-section" class="history-section">
+          <div class="history-header">
+            <h3>📚 ประวัติเกมที่เล่น</h3>
+            <button
+              type="button"
+              id="clearHistoryButton"
+              class="btn-clear-history"
+            >
+              🗑️ ล้างประวัติ
+            </button>
+          </div>
+          <div id="historyContainer"></div>
+        </div>
+      </div>
+
+      <!-- หน้าเกมจับคู่ -->
+      <div id="game-section" class="page hidden">
+        <div class="game-header">
+          <div class="game-title-section">
+            <div class="logo-small">
+              <span class="logo-text">📚</span>
+              <span class="logo-word">VOCAB</span>
+              <span class="logo-text">🎯</span>
+            </div>
+            <h2>🎮 จับคู่คำศัพท์</h2>
+          </div>
+          <div class="score-section">
+            <div class="score">
+              คะแนน: <span id="score">0</span>/<span id="total">0</span>
+            </div>
+            <div class="timer">⏰ <span id="timer">00:00</span></div>
+          </div>
+        </div>
+
+        <div class="match-container">
+          <div class="word-column">
+            <div class="column-title">🇬🇧 คำอังกฤษ</div>
+            <div id="englishWords" class="word-box"></div>
+          </div>
+          <div class="word-column">
+            <div class="column-title">🇹🇭 คำไทย</div>
+            <div id="thaiWords" class="word-box"></div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button type="button" id="resetButton" class="btn-secondary">
+            🔄 เล่นใหม่
+          </button>
+          <button type="button" id="backButton" class="btn-primary">
+            ⬅️ กลับ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Modal สำหรับแก้ไชื่อประวัติ -->
+    <div id="editModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>✏️ แก้ไขชื่อเกม</h3>
+          <button type="button" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="editNameInput" placeholder="ใส่ชื่อใหม่..." />
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="saveNameButton" class="btn-primary">
+            💾 บันทึก
+          </button>
+          <button type="button" id="cancelEditButton" class="btn-secondary">
+            ❌ ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal สำหรับยืนยันการลบ -->
+    <div id="confirmModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>⚠️ ยืนยันการลบ</h3>
+          <button type="button" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmMessage"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="confirmDeleteButton" class="btn-danger">
+            🗑️ ลบ
+          </button>
+          <button type="button" id="cancelDeleteButton" class="btn-secondary">
+            ❌ ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

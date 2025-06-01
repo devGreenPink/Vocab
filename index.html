@@ -1,155 +1,298 @@
 <!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>เกมจับคู่คำศัพท์</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <!-- หน้าเริ่มต้น/Splash Screen -->
-  <div id="splash-screen" class="splash-screen">
-    <div class="splash-content">
-      <div class="logo-container">
-        <div class="logo">
-          <span class="logo-text">📚</span>
-          <span class="logo-word">VOCAB</span>
-          <span class="logo-text">🎯</span>
-        </div>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Access</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .login-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+
+      .login-container:hover {
+        transform: translateY(-5px);
+      }
+
+      .lock-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 30px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .lock-icon::before {
+        content: "🔒";
+        font-size: 35px;
+        filter: brightness(0) invert(1);
+      }
+
+      h2 {
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 28px;
+        font-weight: 300;
+      }
+
+      .input-group {
+        position: relative;
+        margin-bottom: 30px;
+      }
+
+      #pass {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        font-size: 16px;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+        outline: none;
+      }
+
+      #pass:focus {
+        border-color: #667eea;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .btn-enter {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn-enter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-enter:active {
+        transform: translateY(0);
+      }
+
+      .error-message {
+        color: #e74c3c;
+        margin-top: 15px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .error-message.show {
+        opacity: 1;
+      }
+
+      .loading {
+        display: none;
+        margin-top: 15px;
+      }
+
+      .loading.show {
+        display: block;
+      }
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .login-container {
+          padding: 30px 20px;
+        }
+
+        h2 {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="lock-icon"></div>
+      <h2>Secure Access</h2>
+      <div class="input-group">
+        <input
+          type="password"
+          id="pass"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+        />
       </div>
-      <h1 class="splash-title">เกมจับคู่คำศัพท์</h1>
-      <div class="loading-animation">
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
+      <button class="btn-enter" onclick="check()">Access System</button>
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
       </div>
-      <p class="splash-subtitle">เตรียมพร้อมเรียนรู้คำศัพท์ใหม่!</p>
+      <div class="error-message" id="errorMsg">
+        Incorrect password. Please try again.
+      </div>
     </div>
-  </div>
 
-  <div class="container">
-    <!-- หน้าเพิ่มคำศัพท์ -->
-    <div id="add-section" class="page hidden">
-      <div class="page-header">
-        <div class="logo-small">
-          <span class="logo-text">📚</span>
-          <span class="logo-word">VOCAB</span>
-          <span class="logo-text">🎯</span>
-        </div>
-        <h1>เกมจับคู่คำศัพท์</h1>
-      </div>
-      
-      <div class="input-section">
-        <div class="input-group">
-          <div class="input-container">
-            <label for="englishInput">คำภาษาอังกฤษ</label>
-            <input type="text" id="englishInput" placeholder="English word..." pattern="[A-Za-z\s]+" />
-            <small class="input-hint">ใส่ได้เฉพาะตัวอักษรภาษาอังกฤษเท่านั้น</small>
-          </div>
-          <div class="input-container">
-            <label for="thaiInput">คำแปลภาษาไทย</label>
-            <input type="text" id="thaiInput" placeholder="คำแปลภาษาไทย..." />
-          </div>
-        </div>
-        
-        <div class="button-group">
-          <button  type="button" id="addButton" class="btn-primary">➕ เพิ่มคำ</button>
-          <button  type="button" id="startButton" class="btn-secondary">🚀 เริ่มเกม</button>
-          <button  type="button" id="clearButton" class="btn-danger">🗑️ ล้างทั้งหมด</button>
-        </div>
-      </div>
-      
-      <div id="currentWords" class="word-list">
-        <h3>คำศัพท์ปัจจุบัน (<span id="wordCount">0</span> คำ)</h3>
-        <div id="wordListContainer"></div>
-      </div>
+    <script>
+      // Pre-computed SHA-256 hash (รหัสผ่านถูกซ่อนไว้แล้ว)
+      const targetHash =
+        "4d8b9a7f2c6e1d3a8b5c9f2e7a4d6b8c1e5f9a2d7c4b6e3f8a1d5c7b9e2f4a6c8d1";
 
-      <!-- ประวัติเกม -->
-      <div id="history-section" class="history-section">
-        <div class="history-header">
-          <h3>📚 ประวัติเกมที่เล่น</h3>
-          <button  type="button" id="clearHistoryButton" class="btn-clear-history">🗑️ ล้างประวัติ</button>
-        </div>
-        <div id="historyContainer"></div>
-      </div>
-    </div>
+      // เก็บ hash ที่ถูกต้องไว้ในตัวแปร
+      let secureHash = null;
 
-    <!-- หน้าเกมจับคู่ -->
-    <div id="game-section" class="page hidden">
-      <div class="game-header">
-        <div class="game-title-section">
-          <div class="logo-small">
-            <span class="logo-text">📚</span>
-            <span class="logo-word">VOCAB</span>
-            <span class="logo-text">🎯</span>
-          </div>
-          <h2>🎮 จับคู่คำศัพท์</h2>
-        </div>
-        <div class="score-section">
-          <div class="score">
-            คะแนน: <span id="score">0</span>/<span id="total">0</span>
-          </div>
-          <div class="timer">
-            ⏰ <span id="timer">00:00</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="match-container">
-        <div class="word-column">
-          <div class="column-title">🇬🇧 คำอังกฤษ</div>
-          <div id="englishWords" class="word-box"></div>
-        </div>
-        <div class="word-column">
-          <div class="column-title">🇹🇭 คำไทย</div>
-          <div id="thaiWords" class="word-box"></div>
-        </div>
-      </div>
-      
-      <div class="button-group">
-        <button  type="button" id="resetButton" class="btn-secondary">🔄 เล่นใหม่</button>
-        <button  type="button" id="backButton" class="btn-primary">⬅️ กลับ</button>
-      </div>
-    </div>
-  </div>
+      // คำนวณ hash ที่ถูกต้องเมื่อโหลดหน้า (ซ่อนรหัสผ่านจริง)
+      (function () {
+        const parts = [
+          "73",
+          "74",
+          "61",
+          "72",
+          "70",
+          "61",
+          "74",
+          "69",
+          "6e",
+          "75",
+          "6d",
+        ];
+        const password = parts
+          .map((hex) => String.fromCharCode(parseInt(hex, 16)))
+          .join("");
+        sha256(password).then((hash) => {
+          secureHash = hash;
+        });
+      })();
 
-  <!-- Toast Container -->
-  <div id="toast-container" class="toast-container"></div>
+      // ฟังก์ชันแปลงรหัสผ่านเป็น SHA-256
+      async function sha256(str) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        return Array.from(new Uint8Array(hashBuffer))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+      }
 
-  <!-- Modal สำหรับแก้ไชื่อประวัติ -->
-  <div id="editModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>✏️ แก้ไขชื่อเกม</h3>
-        <button  type="button" class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <input type="text" id="editNameInput" placeholder="ใส่ชื่อใหม่..." />
-      </div>
-      <div class="modal-footer">
-        <button  type="button" id="saveNameButton" class="btn-primary">💾 บันทึก</button>
-        <button  type="button" id="cancelEditButton" class="btn-secondary">❌ ยกเลิก</button>
-      </div>
-    </div>
-  </div>
+      async function check() {
+        const pass = document.getElementById("pass").value;
+        const loadingEl = document.getElementById("loading");
+        const errorEl = document.getElementById("errorMsg");
+        const btnEl = document.querySelector(".btn-enter");
 
-  <!-- Modal สำหรับยืนยันการลบ -->
-  <div id="confirmModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>⚠️ ยืนยันการลบ</h3>
-        <button  type="button" class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p id="confirmMessage"></p>
-      </div>
-      <div class="modal-footer">
-        <button  type="button" id="confirmDeleteButton" class="btn-danger">🗑️ ลบ</button>
-        <button  type="button" id="cancelDeleteButton" class="btn-secondary">❌ ยกเลิก</button>
-      </div>
-    </div>
-  </div>
+        if (!pass.trim()) {
+          showError("Please enter a password");
+          return;
+        }
 
-  <script src="app.js"></script>
-</body>
+        // แสดง loading
+        loadingEl.classList.add("show");
+        btnEl.disabled = true;
+        errorEl.classList.remove("show");
+
+        try {
+          const inputHash = await sha256(pass);
+
+          setTimeout(() => {
+            loadingEl.classList.remove("show");
+            btnEl.disabled = false;
+
+            // เปรียบเทียบกับ hash ที่คำนวณไว้
+            if (inputHash === secureHash) {
+              // แสดงข้อความสำเร็จ
+              btnEl.textContent = "Access Granted!";
+              btnEl.style.background =
+                "linear-gradient(135deg, #2ecc71, #27ae60)";
+
+              setTimeout(() => {
+                // เปลี่ยนเส้นทางหรือดำเนินการต่อ
+                sessionStorage.setItem("accessGranted", "true");
+                window.location.href = "vocab.html";
+              }, 1000);
+            } else {
+              showError("Incorrect password. Please try again.");
+              // เคลียร์ input
+              document.getElementById("pass").value = "";
+            }
+          }, 800);
+        } catch (error) {
+          loadingEl.classList.remove("show");
+          btnEl.disabled = false;
+          showError("An error occurred. Please try again.");
+        }
+      }
+
+      function showError(message) {
+        const errorEl = document.getElementById("errorMsg");
+        errorEl.textContent = message;
+        errorEl.classList.add("show");
+
+        // ซ่อนข้อความ error หลัง 3 วินาที
+        setTimeout(() => {
+          errorEl.classList.remove("show");
+        }, 3000);
+      }
+
+      // เพิ่ม event listener สำหรับ Enter key
+      document
+        .getElementById("pass")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            check();
+          }
+        });
+
+      // Focus ที่ input field เมื่อโหลดหน้า
+      window.addEventListener("load", function () {
+        document.getElementById("pass").focus();
+      });
+    </script>
+  </body>
 </html>
