@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3xxx-Words</title>
     <link rel="icon" href="assets/images/man.png" type="image/png" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="3xxx-Words" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.json" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/man.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="assets/images/man.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="assets/images/man.png" />
+    
     <style>
       * {
         margin: 0;
@@ -20,6 +36,14 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
+        /* ป้องกันการ select text บนมือถือ */
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        /* ป้องกันการ highlight บนมือถือ */
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
       }
 
       .login-container {
@@ -77,6 +101,11 @@
         background: #f8f9fa;
         transition: all 0.3s ease;
         outline: none;
+        /* อนุญาตให้ select text ในช่อง input */
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
       }
 
       #pass:focus {
@@ -140,6 +169,31 @@
         margin: 0 auto;
       }
 
+      .install-prompt {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 14px;
+        z-index: 1000;
+        display: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .install-prompt.show {
+        display: block;
+      }
+
+      .install-prompt:hover {
+        background: rgba(0, 0, 0, 1);
+        transform: translateX(-50%) translateY(-5px);
+      }
+
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -156,6 +210,14 @@
 
         h2 {
           font-size: 24px;
+        }
+      }
+
+      /* PWA Display Mode Styles */
+      @media all and (display-mode: standalone) {
+        body {
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
         }
       }
     </style>
@@ -181,7 +243,58 @@
       </div>
     </div>
 
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+      📱 ติดตั้งแอปนี้บนหน้าจอหลัก
+    </div>
+
     <script>
+      // Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+
+      // PWA Install Prompt
+      let deferredPrompt;
+      const installPrompt = document.getElementById('installPrompt');
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later
+        deferredPrompt = e;
+        // Show the install prompt
+        installPrompt.classList.add('show');
+      });
+
+      installPrompt.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          // Show the install prompt
+          deferredPrompt.prompt();
+          // Wait for the user to respond to the prompt
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log(`User response to the install prompt: ${outcome}`);
+          // Clear the deferredPrompt variable
+          deferredPrompt = null;
+          // Hide the install prompt
+          installPrompt.classList.remove('show');
+        }
+      });
+
+      // Hide install prompt when app is installed
+      window.addEventListener('appinstalled', () => {
+        installPrompt.classList.remove('show');
+        deferredPrompt = null;
+      });
+
       // Pre-computed SHA-256 hash (รหัสผ่านถูกซ่อนไว้แล้ว)
       const targetHash =
         "4d8b9a7f2c6e1d3a8b5c9f2e7a4d6b8c1e5f9a2d7c4b6e3f8a1d5c7b9e2f4a6c8d1";
